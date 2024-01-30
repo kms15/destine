@@ -1,0 +1,5 @@
+*~
+*.swp
+venv-destine
+.coverage
+*__pycache__*
