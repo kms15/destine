@@ -1,5 +1,6 @@
 *~
 *.swp
-venv-destine
+.venv
 .coverage
 *__pycache__*
+.pdm-python

@@ -1,0 +1,25 @@
+[project]
+name = "destine"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Kendrick Shaw", email = "km15@kendrickshaw.org"},
+]
+dependencies = [
+]
+requires-python = "==3.11.*"
+readme = "README.md"
+license = {text = "GPL-3.0-or-later"}
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pytest-cov",
+]
+dev = [
+    "black",
+    "isort",
+]
+
+[tool.pdm]
+distribution = false
