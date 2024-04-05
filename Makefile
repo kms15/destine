@@ -1,12 +1,17 @@
 SHELL:=/bin/bash
 
 .PHONY: check
-check: .venv/test/bin/activate
+check: .venv/test/bin/activate .venv/dev/bin/activate
 	source .venv/test/bin/activate && \
 		python3 -m pytest \
 		--cov=destine \
-		--cov-report term-missing \
+		--cov-branch \
+		--cov-report=term-missing \
+		--cov-report=html:coverage-report \
 		--doctest-modules
+	source .venv/dev/bin/activate && \
+		isort --check-only --profile black . \
+		&& black --check .
 
 .PHONY: clean
 clean:
@@ -15,7 +20,7 @@ clean:
 .PHONY: black
 black: .venv/dev/bin/activate
 	source .venv/dev/bin/activate && \
-	 isort destine test
+	 isort --profile black destine test
 	source .venv/dev/bin/activate && \
 	 black destine test
 
