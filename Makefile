@@ -1,17 +1,26 @@
 SHELL:=/bin/bash
 
 .PHONY: check
-check: .venv/test/bin/activate .venv/dev/bin/activate
-	source .venv/test/bin/activate && \
-		python3 -m pytest \
-		--cov=destine \
-		--cov-branch \
-		--cov-report=term-missing \
-		--cov-report=html:coverage-report \
-		--doctest-modules
+check:
+	python3 -m unittest -v tests/test_*.py
+
+.PHONY: pedantic
+pedantic: .venv/minimal/bin/activate .venv/dev/bin/activate
+	# run tests in a minimal environment
+	source .venv/minimal/bin/activate && \
+		python3 -m unittest -v tests/test_*.py
+	# check test coverage
+	source .venv/dev/bin/activate && \
+		coverage run --branch --source destine -m unittest tests/test_*.py
+	source .venv/dev/bin/activate && \
+		coverage html --directory=coverage-report
+	source .venv/dev/bin/activate && \
+		coverage report --show-missing --fail-under=100
+	# check code formatting
 	source .venv/dev/bin/activate && \
 		isort --check-only --profile black . \
 		&& black --check .
+	echo "### All pedantic checks passed! ###"
 
 .PHONY: clean
 clean:
@@ -20,37 +29,39 @@ clean:
 .PHONY: black
 black: .venv/dev/bin/activate
 	source .venv/dev/bin/activate && \
-	 isort --profile black destine test
+		isort --profile black destine tests
 	source .venv/dev/bin/activate && \
-	 black destine test
+		black destine tests
 
-.PHONY: testwatch
-testwatch:
+.PHONY: watchpedantic
+watchpedantic:
 	ls destine/*.py \
-		test/*.py \
-		Makefile requirements.txt \
-		| entr time $(MAKE) check
+		tests/*.py \
+		Makefile requirements*.txt \
+		| entr time $(MAKE) pedantic
 
-.venv/pdm/bin/pdm:
+.venv/pdm/bin/activate-pdm:
 	mkdir -p .venv
 	python3 -m venv .venv/pdm
-	.venv/pdm/bin/pip install pdm
+	source .venv/pdm/bin/activate && \
+		pip install pdm
+	echo "export PDM_PYTHON=$$(pwd)/.venv/pdm/bin/python" > $@
+	echo "source $$(pwd)/.venv/pdm/bin/activate" >> $@
 
 .PHONY: update-requirements
-update-requirements: .venv/pdm/bin/pdm pyproject.toml
-	.venv/pdm/bin/pdm lock -L pdm.lock
-	.venv/pdm/bin/pdm export -L pdm.lock -o requirements.txt
-	.venv/pdm/bin/pdm lock -G dev -L pdm.dev.lock
-	.venv/pdm/bin/pdm export -L pdm.dev.lock -o requirements.dev.txt
-	.venv/pdm/bin/pdm lock -G test -L pdm.test.lock
-	.venv/pdm/bin/pdm export -L pdm.test.lock -o requirements.test.txt
+update-requirements: .venv/pdm/bin/activate-pdm pyproject.toml
+	source .venv/pdm/bin/activate-pdm \
+		&& pdm lock -L pdm.lock \
+		&& pdm export -L pdm.lock -o requirements.txt \
+		&& pdm lock -G dev -L pdm.dev.lock \
+		&& pdm export -L pdm.dev.lock -o requirements.dev.txt
 
-.venv/test/bin/activate: requirements.test.txt
+.venv/minimal/bin/activate: requirements.txt
 	mkdir -p .venv
-	rm -rf .venv/test
-	python3 -m venv .venv/test
-	source .venv/test/bin/activate && \
-	 pip3 install -r requirements.test.txt
+	rm -rf .venv/minimal
+	python3 -m venv .venv/minimal
+	source .venv/minimal/bin/activate && \
+	 pip3 install -r requirements.txt
 
 .venv/dev/bin/activate: requirements.dev.txt
 	mkdir -p .venv
