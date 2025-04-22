@@ -51,6 +51,8 @@ watchpedantic:
 .PHONY: update-requirements
 update-requirements: .venv/pdm/bin/activate-pdm pyproject.toml
 	source .venv/pdm/bin/activate-pdm \
+		&& pdm self update \
+		&& pdm fix \
 		&& pdm lock -L pdm.lock \
 		&& pdm export -L pdm.lock -o requirements.txt \
 		&& pdm lock -G dev -L pdm.dev.lock \
