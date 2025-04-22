@@ -1,5 +1,4 @@
-""" Utility functions
-"""
+"""Utility functions"""
 
 import json
 import subprocess

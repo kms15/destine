@@ -3,6 +3,9 @@
 
 [metadata]
 groups = ["default"]
-strategy = ["cross_platform", "inherit_metadata"]
-lock_version = "4.4.1"
-content_hash = "sha256:a0d6b3b9e7b785243367d1c1a9d4ea94ad817b39f0938f9e2e216efe2ef3d3af"
+strategy = ["inherit_metadata"]
+lock_version = "4.5.0"
+content_hash = "sha256:fc549990427910f1b209a58cbccb553f8b9603fb3aa47d393a39b1d36d6a8f63"
+
+[[metadata.targets]]
+requires_python = ">=3.11"
