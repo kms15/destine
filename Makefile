@@ -18,20 +18,20 @@ pedantic: .venv/minimal/bin/activate .venv/dev/bin/activate
 		coverage report --show-missing --fail-under=100
 	# check code formatting
 	source .venv/dev/bin/activate && \
-		isort --check-only --profile black . \
-		&& black --check .
+		isort --check-only --profile black destine tests \
+		&& black --check --target-version=py313 destine tests
 	echo "### All pedantic checks passed! ###"
 
 .PHONY: clean
 clean:
-	rm -rf .venv
+	rm -rf .venv coverage-report .coverage
 
 .PHONY: black
 black: .venv/dev/bin/activate
 	source .venv/dev/bin/activate && \
 		isort --profile black destine tests
 	source .venv/dev/bin/activate && \
-		black destine tests
+		black --target-version=py313 destine tests
 
 .PHONY: watchpedantic
 watchpedantic:
